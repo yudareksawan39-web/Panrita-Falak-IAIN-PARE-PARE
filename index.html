@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d6b62">
+  <meta name="description" content="Ilmu Falak — arah kiblat, waktu salat, posisi matahari, jadwal bulanan, dan kalkulator falak.">
+  <title>PANRITA FALAK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+<style id="falak-additions">
+.app-mark img{width:76px;height:76px;object-fit:contain;display:block}
+.brand-symbol{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;flex:0 0 46px}
+.brand-symbol img{width:42px;height:42px;object-fit:contain;display:block}
+.coordinate-calculator{display:grid;gap:16px}
+.coordinate-form{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.coordinate-form label{display:grid;gap:7px}
+.coordinate-form input{width:100%;box-sizing:border-box}
+.coordinate-result{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.coordinate-value{padding:14px;border-radius:14px;background:rgba(13,107,98,.08);display:grid;gap:4px}
+.coordinate-value small{opacity:.75}
+.coordinate-value b{font-size:1.15rem}
+.coordinate-name{font-weight:700;margin:0}
+.coordinate-actions{display:flex;flex-wrap:wrap;gap:10px}
+.coordinate-status{min-height:1.2em;font-size:.9rem;opacity:.78}
+@media(max-width:640px){.coordinate-form{grid-template-columns:1fr}.coordinate-result{grid-template-columns:1fr}}
+.coordinate-input-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.coordinate-input-grid label{display:grid;gap:7px}
+.coordinate-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.coordinate-metric{padding:12px;border-radius:14px;background:rgba(13,107,98,.06);display:grid;gap:4px}
+.coordinate-metric small{opacity:.72}
+.coordinate-metric b{font-size:1.02rem}
+.coordinate-section-title{font-weight:700;margin:4px 0 0}
+.coordinate-note{font-size:.88rem;opacity:.75;margin:0}
+@media(max-width:760px){.coordinate-metrics{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.coordinate-input-grid,.coordinate-metrics{grid-template-columns:1fr}}
+</style></head>
+<body>
+  <div id="app">
+    <!-- Splash -->
+    <section id="splashScreen" class="splash-screen">
+      <div class="splash-art">
+        <div class="moon">☾</div>
+        <div class="star star-1">✦</div><div class="star star-2">✧</div>
+        <div class="mosque">
+          <div class="dome"></div>
+          <div class="mosque-body"></div>
+          <div class="minaret left"></div><div class="minaret right"></div>
+        </div>
+      </div>
+      <div class="splash-content">
+        <div class="app-mark"><img src="logo-iain-parepare.png" alt="Logo IAIN Parepare"></div>
+        <h1>PANRITA FALAK</h1>
+        <p>Arah Kiblat • Waktu Salat • Posisi Matahari</p>
+        <div class="quote">“Maka hadapkanlah wajahmu ke arah Masjidil Haram...”<br><small>QS. Al-Baqarah: 144</small></div>
+        <button class="primary-btn splash-start" data-action="start">Mulai</button>
+      </div>
+    </section>
+
+    <!-- Main shell -->
+    <div id="mainShell" class="hidden">
+      <header class="topbar">
+        <button class="icon-btn mobile-menu" data-action="toggle-sidebar" aria-label="Menu">☰</button>
+        <div class="brand">
+          <span class="brand-symbol"><img src="logo-iain-parepare.png" alt="Logo IAIN Parepare"></span>
+          <div><strong>Panrita Falak</strong><small>Arah Kiblat • Waktu Salat • Posisi Matahari</small></div>
+        </div>
+        <button class="icon-btn theme-toggle" data-action="theme" aria-label="Aktifkan mode gelap" title="Aktifkan mode gelap">🌙</button>
+        <label class="language-control" title="Ganti Bahasa"><span class="sr-only">Bahasa</span><select id="languageSelect" aria-label="Bahasa"><option value="id">Indonesia</option><option value="en">English</option><option value="jawi">Arab</option><option value="lontara">Lontara Bugis</option></select></label>
+      </header>
+
+      <div class="layout">
+        <aside id="sidebar" class="sidebar">
+          <nav>
+            <button class="nav-item active" data-page="home"><span>⌂</span>Beranda</button>
+            <button class="nav-item" data-page="qibla"><span>◈</span>Arah Kiblat</button>
+            <button class="nav-item" data-page="rashdul"><span>◉</span>Rashdul Kiblat</button>
+            <button class="nav-item" data-page="sun"><span>☼</span>Posisi Matahari</button>
+            <button class="nav-item" data-page="prayer"><span>◷</span>Waktu Salat</button>
+            <button class="nav-item" data-page="monthly"><span>▦</span>Jadwal Bulanan</button>
+            <button class="nav-item" data-page="calc"><span>ƒ</span>Detail Perhitungan</button>
+            <button class="nav-item" data-page="map"><span>⌖</span>Peta</button>
+            <button class="nav-item" data-page="settings"><span>⚙</span>Pengaturan</button>
+            <button class="nav-item" data-page="info"><span>ⓘ</span>Informasi & Bantuan</button>
+          </nav>
+          <div class="sidebar-footer">Ilmu falak adalah cahaya bagi yang mencari arah dan waktu yang tepat.</div>
+        </aside>
+
+        <main class="content">
+          <!-- Home -->
+          <section class="page active" id="page-home">
+            <div class="home-photo-banner" role="img" aria-label="Gerbang IAIN Parepare saat senja">
+              <div class="home-photo-banner__content">
+                <span class="home-photo-banner__eyebrow">PANRITA FALAK</span>
+                <strong>Menentukan Arah, Memahami Waktu</strong>
+                <span class="home-photo-banner__caption">Ilmu Falak • IAIN Parepare</span>
+              </div>
+            </div>
+            <div class="page-heading">
+              <div><span class="eyebrow">BERANDA</span><h2>Assalāmu'alaikum</h2><p>Semoga hari ini penuh keberkahan 💫</p></div>
+              <div class="live-pill"><i></i><span id="liveClock">--:--:--</span></div>
+            </div>
+
+            <div class="location-card card">
+              <div class="location-icon">⌖</div>
+              <div><small>Lokasi Anda</small><strong id="homeLocation">Kota Parepare, Sulawesi Selatan</strong><span id="homeCoords">Lat -4.0189° • Lon 119.6238°</span></div>
+              <button class="text-btn" data-action="get-location">Gunakan GPS</button>
+            </div>
+
+            <div class="hero-grid">
+              <div class="hero-qibla card gradient-card">
+                <div class="mini-compass"><div class="mini-arrow" id="miniArrow"></div><span>N</span><span>E</span><span>S</span><span>W</span><div class="mini-kaaba">🕋</div></div>
+                <div><small>Arah Kiblat</small><strong id="homeQibla">296.7°</strong><span id="homeQiblaDir">Barat Laut</span></div>
+                <button class="secondary-btn" data-page-jump="qibla">Buka Kompas</button>
+              </div>
+              <div class="card quick-card"><div class="quick-icon">◷</div><small>Salat berikutnya</small><strong id="nextPrayer">--</strong><span id="nextPrayerTime">--:--</span></div>
+              <div class="card quick-card"><div class="quick-icon">☼</div><small>Azimut Matahari</small><strong id="homeSunAzimuth">--°</strong><span id="homeSunAltitude">Alt --°</span></div>
+              <div class="card quick-card"><div class="quick-icon">◉</div><small>Zona Waktu</small><strong id="homeTimezone">WITA</strong><span>UTC+8</span></div>
+            </div>
+
+            <div class="section-title"><h3>Fitur Utama</h3><span>Ilmu Falak</span></div>
+            <div class="feature-grid">
+              <button class="feature-card" data-page-jump="qibla"><span>◈</span><b>Arah Kiblat</b><small>Kompas sensor & azimut</small></button>
+              <button class="feature-card" data-page-jump="prayer"><span>◷</span><b>Waktu Salat</b><small>Jadwal harian akurat</small></button>
+              <button class="feature-card" data-page-jump="monthly"><span>▦</span><b>Jadwal Bulanan</b><small>Kalender waktu salat</small></button>
+              <button class="feature-card" data-page-jump="sun"><span>☼</span><b>Posisi Matahari</b><small>Azimut & ketinggian</small></button>
+              <button class="feature-card" data-page-jump="rashdul"><span>◉</span><b>Rashdul Kiblat</b><small>Waktu bayangan kiblat</small></button>
+              <button class="feature-card" data-page-jump="settings"><span>⚙</span><b>Pengaturan</b><small>Metode hisab & lokasi</small></button>
+            </div>
+          </section>
+
+          <!-- Qibla -->
+          <section class="page" id="page-qibla">
+            <div class="page-heading"><div><span class="eyebrow">KOMPAS</span><h2>Arah Kiblat</h2><p>Gunakan sensor orientasi perangkat untuk navigasi langsung.</p></div><div class="status-dot" id="sensorStatus">Sensor belum aktif</div></div>
+            <div class="location-card card compact"><div class="location-icon">⌖</div><div><small>Lokasi Anda</small><strong id="qiblaLocation">Kota Parepare, Sulawesi Selatan</strong><span id="qiblaCoords">Lat -4.0189° • Lon 119.6238°</span></div><button class="text-btn" data-action="get-location">GPS</button></div>
+            <div class="qibla-layout">
+              <div class="compass-card card">
+                <div class="bearing-top"><small>Arah Kiblat</small><strong id="qiblaBearing">296.7°</strong><span id="qiblaDirection">Barat Laut</span></div>
+                <div id="compass" class="compass">
+                  <div class="compass-ring ring-outer"></div><div class="compass-ring ring-inner"></div>
+                  <div class="cardinal north"></div><div class="cardinal east"></div><div class="cardinal south"></div><div class="cardinal west"></div>
+                  <div class="degree-ticks" id="degreeTicks"></div>
+                  <div class="qibla-needle" id="qiblaNeedle"><div class="needle-tip"></div><div class="needle-tail"></div></div>
+                  <div class="kaaba-center">🕋</div>
+                </div>
+                <div class="compass-readouts"><div><small>Azimut Kiblat</small><b id="qiblaAzimuth">296.7°</b></div><div><small>Arah Mata Angin</small><b id="qiblaCardinal">Barat Laut</b></div></div>
+                <button class="primary-btn" data-action="activate-compass">Aktifkan Kompas</button>
+                <p class="hint">Di iPhone/iPad, izin orientasi harus diberikan oleh pengguna. Kalibrasi perangkat dan jauhkan dari benda bermagnet.</p>
+              </div>
+              <div class="side-info">
+                <div class="info-card card"><span>Koordinat Ka'bah (Makkah)</span><b>21°25′21″ LU</b><b>39°49′34″ BT</b></div>
+                <div class="info-card card"><span>Jarak ke Ka'bah</span><b id="distanceMakkah">-- km</b></div>
+                <div class="info-card card"><span>Deviasi sensor</span><b id="sensorHeading">--°</b><small id="sensorText">Belum membaca sensor.</small></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Map -->
+          <section class="page" id="page-map">
+            <div class="page-heading"><div><span class="eyebrow">PETA</span><h2>Peta Arah Kiblat</h2><p>Lokasi pengguna, Ka'bah, dan garis azimut kiblat.</p></div><div class="button-row"><button class="secondary-btn" data-action="google-earth">Google Earth</button><button class="secondary-btn" data-action="refresh-map">Perbarui</button></div></div>
+            <div class="map-card card"><div id="map" class="map"></div><div id="mapNotice" class="map-notice">AIzaSyDXEx7tZEBGixu-66ZSgRFV4R2U-wQ3j2A <code>config.js</code> untuk mengaktifkan Google Maps.</div></div>
+            <div class="map-summary card"><div><span>Arah Kiblat</span><b id="mapBearing">296.7°</b><small id="mapDirection">Barat Laut</small></div><div><span>Jarak</span><b id="mapDistance">-- km</b></div><div><span>Lokasi</span><b id="mapCoords">-4.0189, 119.6238</b></div></div>
+          </section>
+
+          <!-- Prayer -->
+          <section class="page" id="page-prayer">
+            <div class="page-heading"><div><span class="eyebrow">IBADAH HARIAN</span><h2>Waktu Salat</h2><p id="prayerDateLabel">Hari ini</p></div><button class="secondary-btn" data-action="today">Hari Ini</button></div>
+            <div class="date-control card"><button data-action="date-prev">‹</button><div><small>Tanggal</small><strong id="selectedDate">--</strong></div><button data-action="date-next">›</button></div>
+            <div class="method-summary card"><span>Metode Perhitungan</span><b id="prayerMethodLabel">Umm al-Qura (Makkah)</b><span id="prayerZoneLabel">WITA (UTC+8)</span></div>
+            <div class="prayer-grid" id="prayerGrid"></div>
+            <div class="card calculation-note"><b>Catatan</b><p>Waktu salat dihitung berdasarkan koordinat, tanggal, zona waktu, ketinggian matahari, dan metode Asar yang dipilih. Hasil dapat berbeda beberapa menit dari jadwal resmi setempat.</p></div>
+          </section>
+
+          <!-- Monthly -->
+          <section class="page" id="page-monthly">
+            <div class="page-heading"><div><span class="eyebrow">KALENDER</span><h2>Jadwal Salat Bulanan</h2><p>Perhitungan otomatis untuk seluruh hari dalam bulan.</p></div><button class="secondary-btn" data-action="export-csv">Ekspor CSV</button></div>
+            <div class="month-control card"><button data-action="month-prev">‹</button><strong id="monthLabel">September 2026</strong><button data-action="month-next">›</button></div>
+            <div class="table-wrap card"><table><thead><tr><th>Tanggal</th><th>Subuh</th><th>Terbit</th><th>Zuhur</th><th>Asar</th><th>Maghrib</th><th>Isya</th></tr></thead><tbody id="monthlyBody"></tbody></table></div>
+          </section>
+
+          <!-- Sun -->
+          <section class="page" id="page-sun">
+            <div class="page-heading"><div><span class="eyebrow">ASTRONOMI</span><h2>Posisi Matahari</h2><p>Azimut, ketinggian, dan waktu penting matahari.</p></div></div>
+            <div class="sun-location card"><span>⌖</span><div><b id="sunLocation">Kota Parepare, Sulawesi Selatan</b><small id="sunDate">--</small></div></div>
+            <div class="sun-visual card"><div class="sun-arc"><div class="sun-dot" id="sunDot">☀️</div><div class="horizon"></div><div class="sun-building">▥</div></div></div>
+            <div class="metric-grid"><div class="metric card"><small>Azimut Matahari</small><b id="sunAzimuth">--°</b><span id="sunDirection">--</span></div><div class="metric card"><small>Ketinggian Matahari</small><b id="sunAltitude">--°</b></div><div class="metric card"><small>Waktu Zawal</small><b id="sunZawal">--:--</b></div><div class="metric card"><small>Waktu Istiwā'</small><b id="sunTransit">--:--</b></div></div>
+          </section>
+
+          <!-- Rashdul -->
+          <section class="page" id="page-rashdul">
+            <div class="page-heading"><div><span class="eyebrow">RASHDUL KIBLAT</span><h2>Rashdul Kiblat</h2><p>Perkiraan waktu matahari sejajar dengan arah kiblat.</p></div></div>
+            <div class="rashdul-grid"><div class="rashdul-date card"><span>Tanggal</span><b id="rashdulDate">--</b><button class="text-btn" data-action="rashdul-next">Tanggal Berikutnya</button></div><div class="rashdul-location card"><span>Lokasi</span><b id="rashdulLocation">Kota Parepare, Sulawesi Selatan</b></div></div>
+            <div class="rashdul-main card"><div class="rashdul-illustration">☼<span>⌖</span><strong>Ka'bah</strong></div><div><small>Perkiraan Waktu Rashdul Kiblat</small><strong class="big" id="rashdulTime">--:-- WITA</strong><p id="rashdulExplanation">Rashdul kiblat terjadi ketika posisi Matahari memungkinkan bayangan benda tegak mengarah ke Ka'bah.</p></div></div>
+          </section>
+
+          <!-- Settings -->
+          <section class="page" id="page-settings">
+            <div class="page-heading"><div><span class="eyebrow">KONFIGURASI</span><h2>Pengaturan</h2><p>Atur lokasi dan parameter hisab.</p></div><button class="primary-btn" data-action="save-settings">Simpan</button></div>
+            <div class="settings-grid">
+              <div class="settings-card card"><h3>Lokasi</h3><label>Latitude<input id="latInput" type="number" step="0.000001" value="-4.0189"></label><label>Longitude<input id="lonInput" type="number" step="0.000001" value="119.6238"></label><label>Ketinggian (meter)<input id="elevInput" type="number" step="1" value="50"></label><div class="button-row"><button class="secondary-btn" data-action="get-location">Ambil GPS</button><button class="secondary-btn" data-action="save-location">Simpan Lokasi</button></div></div>
+              <div class="settings-card card"><h3>Metode Perhitungan Waktu Salat</h3><label>Metode Hisab<select id="methodSelect"><option value="umm">Umm al-Qura (Makkah)</option><option value="mw">Muslim World League</option><option value="egypt">Egyptian General Authority</option><option value="karachi">University of Islamic Sciences, Karachi</option><option value="isna">ISNA</option><option value="custom">Kustom</option></select></label><div class="two-col"><label>Subuh (°)<input id="fajrAngle" type="number" step="0.1" value="18"></label><label>Isya (°)<input id="ishaAngle" type="number" step="0.1" value="18"></label></div><h3>Metode Asar</h3><label class="radio"><input type="radio" name="asr" value="1" checked> Syafi'i (1 × tinggi benda)</label><label class="radio"><input type="radio" name="asr" value="2"> Hanafi (2 × tinggi benda)</label></div>
+              <div class="settings-card card"><h3>Zona Waktu</h3><label>Zona<select id="timezoneSelect"><option value="8">WITA (UTC+8)</option><option value="7">WIB (UTC+7)</option><option value="9">WIT (UTC+9)</option><option value="0">UTC</option></select></label><label>Nama Lokasi<input id="locationNameInput" value="Kota Parepare, Sulawesi Selatan"></label></div>
+            </div>
+          </section>
+
+          <!-- Calculator -->
+          <section class="page" id="page-calc">
+            <div class="page-heading"><div><span class="eyebrow">HISAB</span><h2>Detail Perhitungan</h2><p>Rumus yang digunakan aplikasi.</p></div></div>
+            <div class="formula-tabs card"><button class="formula-tab active" data-formula="qibla">Arah Kiblat</button><button class="formula-tab" data-formula="sun">Waktu Salat</button><button class="formula-tab" data-formula="distance">Jarak</button><button class="formula-tab" data-formula="coords">Kalkulator Koordinat</button></div>
+            <div class="formula-card card" id="formulaContent"></div>
+          </section>
+
+          <!-- Info -->
+          <section class="page" id="page-info">
+            <div class="page-heading"><div><span class="eyebrow">BANTUAN</span><h2>Informasi & Bantuan</h2><p>Panduan penggunaan aplikasi.</p></div></div>
+            <div class="accordion-list">
+              <button class="accordion card"><span>Tentang Aplikasi Ilmu Falak</span><b>›</b></button>
+              <div class="accordion-panel card">Aplikasi ini dikembangkan oleh mahasiswa dan mahasiswi IAIN Parepare sebagai media pembelajaran dan pendukung penerapan ilmu falak. Aplikasi ini menyediakan berbagai fitur, meliputi perhitungan arah kiblat, waktu salat, posisi Matahari, jadwal salat bulanan, serta Rashdul Kiblat berdasarkan koordinat geografis pengguna.</div>
+              <button class="accordion card"><span>Panduan Penggunaan</span><b>›</b></button>
+              <div class="accordion-panel card">Izinkan GPS untuk mengambil lokasi. Untuk kompas, gunakan perangkat yang memiliki sensor orientasi dan berikan izin ketika diminta. Untuk Google Maps, isi API key pada file config.js.</div>
+              <button class="accordion card"><span>Akurasi & Referensi</span><b>›</b></button>
+              <div class="accordion-panel card">Azimut kiblat dihitung secara astronomi menggunakan koordinat Ka'bah. Kompas elektronik tetap dipengaruhi sensor, kalibrasi, lingkungan magnetik, dan kemampuan browser.</div>
+              <button class="accordion card"><span>FAQ</span><b>›</b></button>
+              <div class="accordion-panel card">Jika sensor tidak bergerak di laptop, itu normal karena sebagian besar laptop tidak memiliki magnetometer/orientasi. Gunakan ponsel untuk fitur kompas.</div>
+            </div>
+            <div class="developer-note card"><b>Ilmu Falak</b><span>“Ilmu falak adalah cahaya bagi yang mencari arah dan waktu yang tepat.”</span><small>Versi 1.0 • Web App</small></div>
+          </section>
+        </main>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-page="home"><span>⌂</span>Beranda</button>
+        <button class="nav-item" data-page="prayer"><span>◷</span>Jadwal</button>
+        <button class="nav-item" data-page="map"><span>⌖</span>Peta</button>
+        <button class="nav-item" data-page="settings"><span>⚙</span>Pengaturan</button>
+      </nav>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+  <script id="googleMapsLoader"></script>
+</body>
+</html>
